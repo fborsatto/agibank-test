@@ -3,7 +3,6 @@ version: '3'
 services:
   rabbitmq:
     image: "rabbitmq:3-management"
-    hostname: "rabbit"
     ports:
       - "15672:15672"
       - "5672:5672"
@@ -12,6 +11,8 @@ services:
       - "15672"
     volumes:
       - ./rabbitmq-isolated.conf:/etc/rabbitmq/rabbitmq.config
+    networks:
+      - file-network
   file-publisher:
     build:
       context: ./file-publisher
@@ -22,6 +23,8 @@ services:
       - 9081
     depends_on:
       - rabbitmq
+    networks:
+      - file-network
   file-processor:
     build:
       context: ./file-processor
@@ -30,6 +33,8 @@ services:
       - "8081:8081"
     depends_on:
       - rabbitmq
+    networks:
+      - file-network
   file-client:
     build:
       context: ./file-client
@@ -38,3 +43,7 @@ services:
       - "8065:8065"
     depends_on:
       - file-publisher
+    networks:
+      - file-network
+networks:
+  file-network:
